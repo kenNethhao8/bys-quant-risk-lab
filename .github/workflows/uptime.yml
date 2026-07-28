@@ -1,0 +1,26 @@
+name: Uptime
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Check production sites
+        shell: bash
+        run: |
+          set -euo pipefail
+          for url in \
+            https://bys-quant-risk-lab.vercel.app/ \
+            https://frontend-five-pi-77.vercel.app/ \
+            https://bys-modular-city-archive.vercel.app/; do
+            code="$(curl --fail --location --silent --show-error --output /dev/null --write-out '%{http_code}' --max-time 20 "$url")"
+            echo "$code $url"
+          done
